@@ -1,0 +1,21 @@
+version: '3.3'
+services:
+  redis:
+      image: redis:latest
+      hostname: redis
+      container_name: redis
+      restart: always
+      privileged: true
+      ports:
+        - 6379:6379
+      environment:
+        TZ: Asia/Shanghai
+      volumes:
+        - /root/redis/data:/data
+        - /root/redis/conf/redis.conf:/etc/redis/redis.conf
+        - /root/redis/logs:/logs
+      command: [
+        'redis-server',
+        '/etc/redis/redis.conf',
+        '--requirepass '
+    ]

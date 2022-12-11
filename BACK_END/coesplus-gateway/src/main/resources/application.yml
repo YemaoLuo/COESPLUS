@@ -1,0 +1,42 @@
+server:
+  port: 7000
+  error:
+    include-message: ALWAYS
+
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods: "*"
+      routes:
+        - id: coesplus-admin
+          uri: lb://coesplus-admin
+          predicates:
+            - Path=/api/admin/**
+        - id: coesplus-coes
+          uri: lb://coesplus-coes
+          predicates:
+            - Path=/api/coes/**
+        - id: coesplus-auth
+          uri: lb://coesplus-auth
+          predicates:
+            - Path=/api/auth/**
+  redis:
+    host:
+    port:
+    database:
+    password:
+  application:
+    name: coesplus-gateway
+
+logging:
+  config: classpath:logback-spring.xml
+  level:
+    root: info

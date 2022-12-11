@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.coesplus.admin.mapper.StudentMapper">
+
+    <select id="getFaultyCount" resultType="java.util.Map">
+        SELECT faculty_id, COUNT(id) AS count
+        FROM student
+        WHERE is_deleted = 0
+        GROUP BY faculty_id
+    </select>
+</mapper>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.coesplus.admin.mapper.MailSendLogMapper">
+
+    <select id="emailCounter" resultType="com.coesplus.admin.vo.MailCounterVo">
+        SELECT
+            SUBSTR( mail_send_log.`subject`, 10 ) as subject,
+            count( id ) as count
+        FROM
+            `mail_send_log`
+        GROUP BY
+            mail_send_log.`subject`
+    </select>
+</mapper>

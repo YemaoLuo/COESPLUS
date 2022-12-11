@@ -1,0 +1,24 @@
+version: "3"
+services:
+  nacos:
+    image: nacos/nacos-server:v2.1.1
+    container_name: nacos
+    environment:
+      # 支持主机名可以使用hostname,否则使用ip，默认ip
+      - PREFER_HOST_MODE=ip
+      # 单机模式
+      - MODE=standalone
+      # 数据源平台 支持mysql或不保存empty
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      # mysql配置，!!!attention必须是mysql所在主机IP
+      - MYSQL_SERVICE_HOST=
+      - MYSQL_SERVICE_PORT=
+      - MYSQL_SERVICE_USER=
+      - MYSQL_SERVICE_PASSWORD=
+      - MYSQL_SERVICE_DB_NAME=
+    volumes:
+      - ./logs:/home/nacos/logs
+    ports:
+      - 8848:8848
+      - 9848:9848
+    restart: always

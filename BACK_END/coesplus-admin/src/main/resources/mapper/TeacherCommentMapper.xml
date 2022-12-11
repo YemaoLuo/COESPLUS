@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.coesplus.admin.mapper.TeacherCommentMapper">
+
+    <select id="teacherComment" resultType="com.coesplus.admin.vo.TeacherCommentDashboardVo">
+        SELECT
+            teacher.NAME AS NAME,
+            count( teacher_comment.teacher_id ) AS count
+        FROM
+            teacher_comment
+            LEFT JOIN teacher ON teacher.id = teacher_comment.teacher_id
+        GROUP BY
+            teacher_comment.teacher_id
+        ORDER BY
+            count DESC
+        LIMIT 10
+    </select>
+</mapper>

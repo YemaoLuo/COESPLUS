@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.coesplus.coes.mapper.CourseStudentMapper">
+
+    <select id="getCreditInSemester" resultType="java.lang.Integer">
+        SELECT IFNULL(SUM(course.credit), 0)
+        FROM course
+        WHERE course.id IN (SELECT course_student.course_id
+                            FROM course_student
+                            WHERE course_student.student_id = #{studentId}
+                              AND course_student.course_id IN (SELECT semester_course.course_id
+                                                               FROM semester_course
+                                                               WHERE semester_course.semester_id = #{courseId}))
+    </select>
+
+    <select id="dashBoardGrade" resultType="com.coesplus.coes.vo.DashboardGradeVo">
+        SELECT
+            s1.semester AS semester,
+            AVG( cs1.grade ) AS avgGrade
+        FROM
+            course_student cs1,
+            semester_course sc1,
+            semester s1
+        WHERE
+            cs1.course_id = sc1.course_id
+          AND s1.id = sc1.semester_id
+          AND cs1.student_id = #{id}
+        GROUP BY
+            s1.semester
+    </select>
+
+    <select id="dashBoardGradeTeacher" resultType="com.coesplus.coes.vo.DashboardGradeVo">
+        SELECT
+            s1.semester AS semester,
+            AVG( cs1.grade ) AS avgGrade
+        FROM
+            course_student cs1,
+            semester_course sc1,
+            course c,
+            semester s1
+        WHERE
+            cs1.course_id = sc1.course_id
+          AND s1.id = sc1.semester_id
+          AND c.id = cs1.course_id
+          AND c.teacher_id = #{id}
+        GROUP BY
+            s1.semester
+    </select>
+</mapper>

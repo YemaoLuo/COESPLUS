@@ -1,0 +1,18 @@
+version: '3'
+services:
+  minio:
+    image:  minio/minio
+    container_name: minio
+    environment:
+      - MINIO_ACCESS_KEY=
+      - MINIO_SECRET_KEY=
+    command: server --console-address ':9001' /data
+    volumes:
+      - /root/minio/data:/data
+      - /root/minio/config:/root/.minio/
+      - /etc/localtime:/etc/localtime
+    ports:
+      - "9070:9000"
+      - "9071:9001"
+    network_mode: bridge
+    restart: always
