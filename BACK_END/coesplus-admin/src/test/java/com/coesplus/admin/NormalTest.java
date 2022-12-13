@@ -31,6 +31,13 @@ public class NormalTest {
     }
 
     @Test
+    public void testSplit2() {
+        String s = "{\"newPassword\":\"13719043688\"}";
+        String[] split = s.split("\"");
+        log.info(split[3]);
+    }
+
+    @Test
     public void testSplit() {
         String fileName = "1231231298fdajf.png";
         log.info(fileName.split("\\.")[1]);

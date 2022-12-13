@@ -61,7 +61,6 @@ public class StudentSemesterController {
             Student currentStudent = (Student) BaseContext.getValue("currentStudent");
             if (ObjectUtils.isEmpty(currentStudent)) {
                 return Result.error("获取登陆学生信息失败！");
-
             }
             if (StringUtils.isEmpty(currentStudent.getJoinYear())) {
                 return Result.error("缺少入学年份信息！不可参与选课！");
@@ -153,19 +152,20 @@ public class StudentSemesterController {
                 Map<String, Map> facultyMap = facultyService.getIDNameMap();
                 for (SemesterCourse course : courseList) {
                     SemesterCourseVo vo = new SemesterCourseVo();
-                    Map map = facultyMap.get(course.getFacultyId());
+                    Course courseById = courseService.getById(course.getCourseId());
+                    Map map = facultyMap.get(courseById.getFacultyId());
                     if (ObjectUtils.isEmpty(map)) {
                         vo.setFacultyName("");
                     } else {
                         vo.setFacultyName((String) map.get("name"));
                     }
-                    Course courseById = courseService.getById(course.getCourseId());
                     BeanUtils.copyProperties(courseById, vo);
                     vo.setTeacherName(teacherService.getById(courseById.getTeacherId()).getName());
                     String remainSeat = redisTemplate.opsForValue().get(RedisPrefix.seatRemain + currentSemester.getId() + course.getCourseId());
                     vo.setAvailableSeat(StringUtils.isEmpty(remainSeat) ? 0 : Integer.parseInt(remainSeat));
                     LambdaQueryWrapper<CourseStudent> courseStudentQueryWrapper = new LambdaQueryWrapper<>();
                     courseStudentQueryWrapper.eq(CourseStudent::getCourseId, course.getCourseId())
+                            .eq(CourseStudent::getStudentId, currentStudent.getId())
                             .eq(CourseStudent::getIsDeleted, 0);
                     long count = courseStudentService.count(courseStudentQueryWrapper);
                     if (count > 0) {
@@ -174,6 +174,7 @@ public class StudentSemesterController {
                         vo.setIsChosen(0);
                     }
                     vo.setCourseName(courseById.getName());
+                    log.info(vo.toString());
                     voList.add(vo);
                 }
                 page.setRecords(voList);

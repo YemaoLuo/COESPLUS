@@ -81,7 +81,9 @@ public class SemesterController {
             if (semester.getStartTime().after(semester.getEndTime())) {
                 return Result.error("选取开始时间和结束时间不合法！");
             }
-            //存入数据库
+            // 开始时默认关闭抢课
+            semester.setIsDeleted(1);
+            // 存入数据库
             semesterService.save(semester);
             return Result.ok();
         } catch (Exception e) {

@@ -225,6 +225,7 @@ public class FacultyController {
                     return Result.error("当前学院仍存在老师！无法删除！");
                 }
             }
+            facultyService.removeById(id);
             return Result.ok();
         } catch (Exception e) {
             log.error(e.getMessage(), e);

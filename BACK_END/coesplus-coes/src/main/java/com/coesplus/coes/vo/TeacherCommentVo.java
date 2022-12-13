@@ -22,6 +22,8 @@ public class TeacherCommentVo {
 
     private String comment;
 
+    private int isMine;
+
     @TableField(fill = FieldFill.INSERT)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

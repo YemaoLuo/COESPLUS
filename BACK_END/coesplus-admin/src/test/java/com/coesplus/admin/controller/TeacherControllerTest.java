@@ -67,9 +67,9 @@ public class TeacherControllerTest {
         log.info(result.toString());
     }
 
-    @Test
+    /*@Test
     void resetPassword() {
         Result result = teacherController.resetPassword("f91b15750453874c834e09fe1fc1aae9", "unitTest");
         log.info(result.toString());
-    }
+    }*/
 }

@@ -13,6 +13,7 @@ import com.coesplus.admin.service.UserActivateService;
 import com.coesplus.common.entity.Course;
 import com.coesplus.common.entity.Teacher;
 import com.coesplus.common.entity.UserActivate;
+import com.coesplus.common.utils.MailContentUtil;
 import com.coesplus.common.utils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -46,10 +47,9 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
             return Result.error("老师ID或姓名不可为空！");
         }
         LambdaQueryWrapper<Teacher> teacherQueryWrapper = new LambdaQueryWrapper<>();
-        teacherQueryWrapper.or()
-                .eq(Teacher::getTeacherId, teacherDto.getTeacherId())
-                .eq(StringUtils.isNotEmpty(teacherDto.getEmail()), Teacher::getEmail, teacherDto.getEmail())
-                .eq(Teacher::getName, teacherDto.getName());
+        teacherQueryWrapper.eq(Teacher::getTeacherId, teacherDto.getTeacherId())
+                .or().eq(StringUtils.isNotEmpty(teacherDto.getEmail()), Teacher::getEmail, teacherDto.getEmail())
+                .or().eq(Teacher::getName, teacherDto.getName());
         long count = this.count(teacherQueryWrapper);
         if (count != 0) {
             return Result.error("老师ID或Email或姓名已存在！");
@@ -57,12 +57,6 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         //Vo -> Entity
         Teacher teacher = new Teacher();
         BeanUtils.copyProperties(teacherDto, teacher);
-        //字典翻译
-        if (teacherDto.getSex().equals("男")) {
-            teacher.setSex("1");
-        } else {
-            teacher.setSex("0");
-        }
         String password = IdUtil.simpleUUID().substring(0, 10);
         teacher.setPassword(DigestUtils.md5DigestAsHex(password.getBytes()));
         this.save(teacher);
@@ -70,7 +64,8 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         //发送密码通知邮件
         String msg = teacher.getName() + "老师！您COES的初始密码为：" + password + "。请尽快重设密码！";
         ThreadUtil.execAsync(() -> {
-            mailSendLogService.sendComplexMessage(teacher.getEmail(), "COES-Plus账户创建", msg);
+            String content = MailContentUtil.build("COES-Plus账户创建", "您COES的初始密码为：" + password + "。请尽快重设密码！", teacher.getName() + "老师");
+            mailSendLogService.sendComplexMessage(teacher.getEmail(), "COES-Plus账户创建", content);
         });
         return Result.ok();
     }

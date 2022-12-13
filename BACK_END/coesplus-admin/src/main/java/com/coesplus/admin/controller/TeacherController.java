@@ -18,7 +18,6 @@ import com.coesplus.common.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.DigestUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -305,7 +304,7 @@ public class TeacherController {
     /**
      * 修改密码
      */
-    @PatchMapping(value = "/password/{id}")//{}占位符，其中的data作为id
+    /*@PatchMapping(value = "/password/{id}")//{}占位符，其中的data作为id
     public Result resetPassword(@PathVariable("id") String id, @RequestBody String newPassword) {
         try {
             //接口逻辑：1. 利用@RequestBody接收password。（见上！！）
@@ -326,5 +325,5 @@ public class TeacherController {
             log.error(e.getMessage(), e);
             return Result.error(e.getMessage());
         }
-    }
+    }*/
 }

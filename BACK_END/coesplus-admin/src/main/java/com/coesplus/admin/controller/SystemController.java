@@ -9,6 +9,7 @@ import com.coesplus.common.entity.Administrator;
 import com.coesplus.common.entity.Student;
 import com.coesplus.common.entity.Teacher;
 import com.coesplus.common.entity.UserActivate;
+import com.coesplus.common.utils.MailContentUtil;
 import com.coesplus.common.utils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.ServiceInstance;
@@ -53,7 +54,7 @@ public class SystemController {
     public Result sendActivationEmail(@RequestParam("role") String role, @PathVariable("id") String id, HttpServletRequest request) {
         try {
             String url = request.getHeader("Origin");
-            String baseUrl = url + "/login#/ModifyPassword?";
+            String baseUrl = url + "/#/ModifyPassword?";
             LambdaQueryWrapper<UserActivate> userActivateLambdaQueryWrapper = new LambdaQueryWrapper<>();
             userActivateLambdaQueryWrapper.eq(UserActivate::getUserId, id)
                     .eq(UserActivate::getIsDeleted, 0);
@@ -64,7 +65,7 @@ public class SystemController {
                 UserActivate userActivate2 = new UserActivate();
                 userActivate2.setUserId(id)
                         .setVerifyToken(IdUtil.simpleUUID())
-                        .setRole("student");
+                        .setRole(role);
                 userActivateService.save(userActivate2);
                 token = userActivate2.getVerifyToken();
             } else {
@@ -74,6 +75,7 @@ public class SystemController {
             log.info(role + "::" + id + "::" + baseUrl);
             String email;
             String msg;
+            String content = "";
             //查出email
             if (role.equals("student")) {
                 LambdaQueryWrapper<Student> studentQueryWrapper = new LambdaQueryWrapper<>();
@@ -81,27 +83,28 @@ public class SystemController {
                         .select(Student::getName, Student::getEmail);
                 Student student = studentService.getOne(studentQueryWrapper);
                 email = student.getEmail();
-                msg = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"></head><body>" + student.getName()
-                        + "同学！请尽快重置您的密码！链接为：<a href=\"" + baseUrl + "\">" + baseUrl + "</a></body></html>";
+                msg = "请尽快重置您的密码！链接为：<a href=\"" + baseUrl + "\">" + baseUrl + "</a>";
+                content = MailContentUtil.build("COES-Plus重置密码", msg,  student.getName() + "同学");
             } else if (role.equals("teacher")) {
                 LambdaQueryWrapper<Teacher> teacherQueryWrapper = new LambdaQueryWrapper<>();
                 teacherQueryWrapper.eq(Teacher::getId, id)
                         .select(Teacher::getName, Teacher::getEmail);
                 Teacher teacher = teacherService.getOne(teacherQueryWrapper);
                 email = teacher.getEmail();
-                msg = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"></head><body>" + teacher.getName()
-                        + "老师！请尽快重置您的密码！链接为：<a href=\"" + baseUrl + "\">" + baseUrl + "</a></body></html>";
+                msg = "请尽快重置您的密码！链接为：<a href=\"" + baseUrl + "\">" + baseUrl + "</a>";
+                content = MailContentUtil.build("COES-Plus重置密码", msg,  teacher.getName() + "老师");
             } else {
                 LambdaQueryWrapper<Administrator> adminQueryWrapper = new LambdaQueryWrapper<>();
                 adminQueryWrapper.eq(Administrator::getId, id)
                         .select(Administrator::getName, Administrator::getEmail);
                 Administrator admin = administratorService.getOne(adminQueryWrapper);
                 email = admin.getEmail();
-                msg = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"></head><body>" + admin.getName()
-                        + "管理员！请尽快重置您的密码！链接为：<a href=\"" + baseUrl + "\">" + baseUrl + "</a></body></html>";
+                msg = "请尽快重置您的密码！链接为：<a href=\"" + baseUrl + "\">" + baseUrl + "</a>";
+                content = MailContentUtil.build("COES-Plus重置密码", msg,  admin.getName() + "管理员");
             }
+            final String info = content;
             ThreadUtil.execAsync(() -> {
-                mailSendLogService.sendComplexMessage(email, "COES-Plus重置密码", msg);
+                mailSendLogService.sendComplexMessage(email, "COES-Plus重置密码", info);
             });
             return Result.ok();
         } catch (Exception e) {

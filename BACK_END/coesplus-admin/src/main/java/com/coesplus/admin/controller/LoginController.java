@@ -173,7 +173,7 @@ public class LoginController {
             }
             if (userActivate.getRole().equals("student")) {
                 Student studentById = studentService.getById(userActivate.getUserId());//调用服务层的方法（从id获取对象），得到实体
-                String encryptPassword = DigestUtils.md5DigestAsHex(newPassword.getBytes());//先加密
+                String encryptPassword = DigestUtils.md5DigestAsHex(newPassword.split("\"")[3].getBytes());//先加密
                 studentById.setPassword(encryptPassword);//再放回对象
                 studentById.setIsDeleted(0);
                 studentService.updateById(studentById);//上传数据库

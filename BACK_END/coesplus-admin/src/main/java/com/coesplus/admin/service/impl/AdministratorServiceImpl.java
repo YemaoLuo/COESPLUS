@@ -9,6 +9,7 @@ import com.coesplus.admin.service.AdministratorService;
 import com.coesplus.admin.service.MailSendLogService;
 import com.coesplus.admin.service.UserActivateService;
 import com.coesplus.common.entity.Administrator;
+import com.coesplus.common.utils.MailContentUtil;
 import com.coesplus.common.utils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -48,9 +49,9 @@ public class AdministratorServiceImpl extends ServiceImpl<AdminisratorMapper, Ad
             this.save(administrator);
             log.info(administrator.toString());
             //发送密码通知邮件
-            String msg = administrator.getName() + "管理员！您COES的初始密码为：" + password + "。请尽快重设密码！";
             ThreadUtil.execAsync(() -> {
-                mailSendLogService.sendComplexMessage(administrator.getEmail(), "COES-Plus账户创建", msg);
+                String content = MailContentUtil.build("COES-Plus账户创建", "您COES的初始密码为：" + password + "。请尽快重设密码！", administrator.getName() + "管理员");
+                mailSendLogService.sendComplexMessage(administrator.getEmail(), "COES-Plus账户创建", content);
             });
             return Result.ok();
         }

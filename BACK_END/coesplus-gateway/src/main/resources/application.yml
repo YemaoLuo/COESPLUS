@@ -7,7 +7,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr:
+        server-addr: 
     gateway:
       globalcors:
         cors-configurations:
@@ -30,9 +30,9 @@ spring:
             - Path=/api/auth/**
   redis:
     host:
-    port:
-    database:
-    password:
+    port: 
+    database: 
+    password: 
   application:
     name: coesplus-gateway
 

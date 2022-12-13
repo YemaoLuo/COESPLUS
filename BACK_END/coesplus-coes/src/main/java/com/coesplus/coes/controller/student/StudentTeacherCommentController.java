@@ -46,6 +46,10 @@ public class StudentTeacherCommentController {
     public Result page(@RequestParam("currentPage") int currentPage, @RequestParam("pageSize") int pageSize,
                        @RequestParam(value = "teacherName", required = false) String teacherName) {
         try {
+            Student currentStudent = (Student) BaseContext.getValue("currentStudent");
+            if (ObjectUtils.isEmpty(currentStudent)) {
+                return Result.error("获取登陆学生信息失败！");
+            }
             Page page = new Page(currentPage, pageSize);
             List<Teacher> teacherList = new ArrayList<>();
             //查出teacherId
@@ -69,8 +73,12 @@ public class StudentTeacherCommentController {
                 TeacherCommentVo vo = new TeacherCommentVo();
                 BeanUtils.copyProperties(record, vo);
                 vo.setTeacherName(teacherService.getById(record.getTeacherId()).getName());
+                vo.setIsMine(0);
                 String studentName = studentService.getById(record.getStudentId()).getName();
-                if (studentName.length() > 1 && studentName.length() < 3) {
+                if (studentName.equals(currentStudent.getName())) {
+                    vo.setIsMine(1);
+                }
+                if (studentName.length() == 2) {
                     studentName = studentName.substring(0, 1) + "*";
                 }else if (studentName.length() >= 3) {
                     studentName = studentName.substring(0, 1) + "*" + studentName.substring(studentName.length() - 1, studentName.length());
@@ -172,21 +180,25 @@ public class StudentTeacherCommentController {
                 teacherCommentDto.setStudentName(currentStudent.getName());
                 LambdaQueryWrapper<CourseStudent> courseStudentLambdaQueryWrapper = new LambdaQueryWrapper<>();
                 courseStudentLambdaQueryWrapper.eq(CourseStudent::getStudentId, currentStudent.getId())
-                                .select(CourseStudent::getCourseId);
+                        .select(CourseStudent::getCourseId);
                 LambdaQueryWrapper<Teacher> teacherQueryWrapper = new LambdaQueryWrapper<>();
                 teacherQueryWrapper.eq(Teacher::getName, teacherCommentDto.getTeacherName())
                         .select(Teacher::getId);
                 List<String> teacherIdList = teacherService.list(teacherQueryWrapper).stream().map(Teacher::getId).collect(Collectors.toList());
                 List<String> courseIdList = courseStudentService.list(courseStudentLambdaQueryWrapper).stream().map(CourseStudent::getCourseId).collect(Collectors.toList());
-                if (teacherIdList.size() == 0 || courseIdList.size() == 0) {
+                if (teacherIdList.size() == 0) {
                     return Result.error("老师不存在！");
+                }
+                if (courseIdList.size() == 0) {
+                    return Result.error("您还没有选修任何课程！");
+
                 }
                 LambdaQueryWrapper<Course> courseQueryWrapper = new LambdaQueryWrapper<>();
                 courseQueryWrapper.in(Course::getId, courseIdList)
                         .in(Course::getTeacherId, teacherIdList);
                 long count = courseService.count(courseQueryWrapper);
                 if (count == 0) {
-                    return Result.error("您没有上过该老师课程，无法评论！");
+                    return Result.error("您没有上过该老师的课程，无法评论！");
                 }
             }
             //获取student teacher id

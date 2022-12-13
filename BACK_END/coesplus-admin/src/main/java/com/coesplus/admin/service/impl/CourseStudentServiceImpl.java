@@ -58,7 +58,7 @@ public class CourseStudentServiceImpl extends ServiceImpl<CourseStudentMapper, C
         Course courseById = courseService.getById(courseStudent.getCourseId());
         LambdaQueryWrapper<CourseStudent> csQueryWrapper = new LambdaQueryWrapper<>();
         csQueryWrapper.eq(CourseStudent::getCourseId, courseStudent.getCourseId());
-        courseById.setSeatChosen(Math.toIntExact(this.count(csQueryWrapper) + 1));
+        courseById.setSeatChosen(Math.toIntExact(this.count(csQueryWrapper)));
         courseService.updateById(courseById);
         return Result.ok();
     }
@@ -69,7 +69,7 @@ public class CourseStudentServiceImpl extends ServiceImpl<CourseStudentMapper, C
         Course courseById = courseService.getById(this.getById(id).getCourseId());
         LambdaQueryWrapper<CourseStudent> csQueryWrapper = new LambdaQueryWrapper<>();
         csQueryWrapper.eq(CourseStudent::getCourseId, courseById.getCourseId());
-        courseById.setSeatChosen(Math.toIntExact(this.count(csQueryWrapper) - 1));
+        courseById.setSeatChosen(Math.toIntExact(this.count(csQueryWrapper)));
         courseService.updateById(courseById);
         this.removeById(id);
     }

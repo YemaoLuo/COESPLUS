@@ -19,6 +19,10 @@ public class SemesterCourseVo {
 
     private String teacherName;
 
+    private String courseId;
+
+    private String name;
+
     private String day;
 
     private int credit;
@@ -31,11 +35,11 @@ public class SemesterCourseVo {
 
     private int isChosen;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "HH:mm")
+    @DateTimeFormat(pattern = "HH:mm")
     private Date startTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "HH:mm")
+    @DateTimeFormat(pattern = "HH:mm")
     private Date endTime;
 }
